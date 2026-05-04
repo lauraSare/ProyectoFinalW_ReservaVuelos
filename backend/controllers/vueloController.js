@@ -15,6 +15,24 @@ const obtenerVuelos = async (req, res) => {
   }
 };
 
+// Obtener un vuelo por ID
+const obtenerVueloPorId = async (req, res) => {
+  try {
+    const vuelo = await Vuelo.findByPk(req.params.id, {
+      include: [
+        { model: Ruta },
+        { model: Avion }
+      ]
+    });
+    if (!vuelo) {
+      return res.status(404).json({ mensaje: 'Vuelo no encontrado' });
+    }
+    res.json(vuelo);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener vuelo', error: error.message });
+  }
+};
+
 // Crear un vuelo
 const crearVuelo = async (req, res) => {
   try {
@@ -27,7 +45,6 @@ const crearVuelo = async (req, res) => {
       id_avion
     } = req.body;
 
-    // Verificar si el codigo ya existe
     const existe = await Vuelo.findOne({ where: { codigo_vuelo } });
     if (existe) {
       return res.status(400).json({ mensaje: 'El código de vuelo ya existe' });
@@ -49,4 +66,36 @@ const crearVuelo = async (req, res) => {
   }
 };
 
-module.exports = { obtenerVuelos, crearVuelo };
+// Actualizar un vuelo
+const actualizarVuelo = async (req, res) => {
+  try {
+    const vuelo = await Vuelo.findByPk(req.params.id);
+    if (!vuelo) {
+      return res.status(404).json({ mensaje: 'Vuelo no encontrado' });
+    }
+
+    await vuelo.update(req.body);
+    res.json({ mensaje: 'Vuelo actualizado exitosamente', vuelo });
+
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar vuelo', error: error.message });
+  }
+};
+
+// Eliminar un vuelo
+const eliminarVuelo = async (req, res) => {
+  try {
+    const vuelo = await Vuelo.findByPk(req.params.id);
+    if (!vuelo) {
+      return res.status(404).json({ mensaje: 'Vuelo no encontrado' });
+    }
+
+    await vuelo.destroy();
+    res.json({ mensaje: 'Vuelo eliminado exitosamente' });
+
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar vuelo', error: error.message });
+  }
+};
+
+module.exports = { obtenerVuelos, obtenerVueloPorId, crearVuelo, actualizarVuelo, eliminarVuelo };
