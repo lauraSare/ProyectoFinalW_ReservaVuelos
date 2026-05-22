@@ -189,7 +189,7 @@ const handleLogin = async () => {
     }
     loading.value = true
     try {
-        const res = await axios.post('http://localhost:3000/api/auth/login', {
+        const res = await axios.post('https://app-ee670211-7bf1-4ba5-9265-707f8e6decac.cleverapps.io/api/auth/login', {
             ...form.value,
             captchaToken: captchaToken.value
         }, { withCredentials: true })

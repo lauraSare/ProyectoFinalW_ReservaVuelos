@@ -342,7 +342,7 @@ const handleRegistro = async () => {
 
     loading.value = true
     try {
-        await axios.post('http://localhost:3000/api/auth/registro', form.value)
+        await axios.post('https://app-ee670211-7bf1-4ba5-9265-707f8e6decac.cleverapps.io/api/auth/registro', form.value)
         success.value = '¡Cuenta creada exitosamente! Redirigiendo...'
         setTimeout(() => router.push('/login'), 2000)
     } catch (err) {
