@@ -1,0 +1,8 @@
+{
+  "build": {
+    "type": "npm",
+    "goal": "build",
+    "dir": "frontend"
+  },
+  "webRoot": "frontend/dist"
+}
