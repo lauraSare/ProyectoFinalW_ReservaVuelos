@@ -1,5 +1,8 @@
 {
   "deploy": {
     "appFolder": "backend"
+  },
+  "scripts": {
+    "start": "node app.js"
   }
 }
