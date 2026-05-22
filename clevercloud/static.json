@@ -3,7 +3,7 @@
   "redirections": [
     {
       "type": "rewrite",
-      "from": "^/.*$",
+      "from": "^.*$",
       "to": "/index.html"
     }
   ]
