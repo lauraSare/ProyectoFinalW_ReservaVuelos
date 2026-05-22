@@ -1,0 +1,13 @@
+{
+  "apps": [
+    {
+      "app_id": "app_ee670211-7bf1-4ba5-9265-707f8e6decac",
+      "org_id": "user_aeff6371-3cf0-4a45-83a8-2f2173bc209e",
+      "deploy": {
+        "clever_cloud": {
+          "build_dir": "backend"
+        }
+      }
+    }
+  ]
+}
