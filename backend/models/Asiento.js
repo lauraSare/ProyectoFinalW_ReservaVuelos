@@ -12,7 +12,7 @@ const Asiento = sequelize.define('Asiento', {
         allowNull: false
     },
     clase: {
-        type: DataTypes.ENUM('turista', 'ejecutiva', 'primera clase'),
+        type: DataTypes.ENUM('turista', 'ejecutiva', 'primera_clase'),
         allowNull: false
     },
     id_avion: {

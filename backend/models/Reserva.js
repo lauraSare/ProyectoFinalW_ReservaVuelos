@@ -1,33 +1,42 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/database");
 
-const Reserva = sequelize.define('Reserva', {
+const Reserva = sequelize.define(
+  "Reserva",
+  {
     id_reserva: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     fecha_reserva: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
     },
     estado: {
-        type: DataTypes.ENUM('confirmada', 'cancelada', 'en espera'),
-        allowNull: false,
-        defaultValue: 'en espera'
+      type: DataTypes.ENUM("confirmada", "cancelada", "en_espera"),
+      allowNull: false,
+      defaultValue: "en_espera",
     },
     id_vuelo: {
-        type: DataTypes.INTEGER,
-        allowNull: false
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     id_pasajero: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-    }
-}, {
-    tableName: 'reservas',
-    timestamps: false
-});
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    // ←←← NUEVO CAMPO PARA RESERVAS GRUPALES
+    id_grupo: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+  },
+  {
+    tableName: "reservas",
+    timestamps: false,
+  },
+);
 
 module.exports = Reserva;

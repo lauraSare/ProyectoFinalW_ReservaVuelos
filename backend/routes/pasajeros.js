@@ -3,12 +3,16 @@ const router = express.Router();
 const {
   obtenerPasajeros,
   obtenerPasajeroPorId,
+  crearPasajero,
   actualizarPasajero,
   eliminarPasajero,
 } = require("../controllers/pasajeroController");
 
 // Obtener todos los pasajeros
 router.get("/", obtenerPasajeros);
+
+// Crear un pasajero
+router.post("/", crearPasajero);
 
 // Obtener un pasajero por ID
 router.get("/:id", obtenerPasajeroPorId);

@@ -1,12 +1,19 @@
-const { Vuelo, Ruta, Avion } = require('../models/index');
+const { Vuelo, Ruta, Avion, Aeropuerto } = require('../models/index');
+const { validarVuelo } = require('../utils/validadores');
 
 // Obtener todos los vuelos
 const obtenerVuelos = async (req, res) => {
   try {
     const vuelos = await Vuelo.findAll({
       include: [
-        { model: Ruta },
-        { model: Avion }
+        { 
+          model: Ruta, as: 'Ruta',
+          include: [
+            { model: Aeropuerto, as: 'Origen' },
+            { model: Aeropuerto, as: 'Destino' }
+          ]
+        },
+        { model: Avion, as: 'Avion' }
       ]
     });
     res.json(vuelos);
@@ -20,8 +27,14 @@ const obtenerVueloPorId = async (req, res) => {
   try {
     const vuelo = await Vuelo.findByPk(req.params.id, {
       include: [
-        { model: Ruta },
-        { model: Avion }
+        { 
+          model: Ruta, as: 'Ruta',
+          include: [
+            { model: Aeropuerto, as: 'Origen' },
+            { model: Aeropuerto, as: 'Destino' }
+          ]
+        },
+        { model: Avion, as: 'Avion' }
       ]
     });
     if (!vuelo) {
@@ -44,6 +57,11 @@ const crearVuelo = async (req, res) => {
       id_ruta,
       id_avion
     } = req.body;
+
+    const errorValidacion = validarVuelo(req.body);
+    if (errorValidacion) {
+      return res.status(400).json({ mensaje: errorValidacion });
+    }
 
     const existe = await Vuelo.findOne({ where: { codigo_vuelo } });
     if (existe) {
@@ -74,6 +92,11 @@ const actualizarVuelo = async (req, res) => {
       return res.status(404).json({ mensaje: 'Vuelo no encontrado' });
     }
 
+    const errorValidacion = validarVuelo({ ...vuelo.toJSON(), ...req.body });
+    if (errorValidacion) {
+      return res.status(400).json({ mensaje: errorValidacion });
+    }
+
     await vuelo.update(req.body);
     res.json({ mensaje: 'Vuelo actualizado exitosamente', vuelo });
 
@@ -90,10 +113,34 @@ const eliminarVuelo = async (req, res) => {
       return res.status(404).json({ mensaje: 'Vuelo no encontrado' });
     }
 
+    // Solo se pueden eliminar vuelos cancelados
+    if (vuelo.estado !== 'cancelado') {
+      return res.status(400).json({ 
+        mensaje: `Solo se pueden eliminar vuelos con estado "cancelado". Este vuelo está "${vuelo.estado}".` 
+      });
+    }
+
+    // Verificar si tiene reservas asociadas
+    const { Reserva, VueloTripulacion } = require('../models/index');
+    const reservas = await Reserva.count({ where: { id_vuelo: req.params.id } });
+    if (reservas > 0) {
+      return res.status(400).json({ 
+        mensaje: `No se puede eliminar el vuelo porque tiene ${reservas} reserva(s) asociada(s).` 
+      });
+    }
+
+    // Eliminar registros relacionados antes de borrar
+    const { sequelize } = require('../models/index');
+    await VueloTripulacion.destroy({ where: { id_vuelo: req.params.id } });
+    await sequelize.query('DELETE FROM vuelo_asientos WHERE id_vuelo = :id', {
+      replacements: { id: req.params.id }
+    });
+
     await vuelo.destroy();
     res.json({ mensaje: 'Vuelo eliminado exitosamente' });
 
   } catch (error) {
+    console.error('ERROR ELIMINAR VUELO:', error);
     res.status(500).json({ mensaje: 'Error al eliminar vuelo', error: error.message });
   }
 };

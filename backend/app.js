@@ -8,7 +8,7 @@ const {
   noAccesoDirectorios,
   verificarTimeout,
 } = require("./middlewares/seguridad");
-const { verificarSesion } = require("./middlewares/autenticacion");
+const { verificarSesion } = require("./middlewares/auth");
 
 const app = express();
 
@@ -19,6 +19,8 @@ app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
   }),
 );
 app.use(express.json());
@@ -28,11 +30,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "secreto123",
-    resave: false,
-    saveUninitialized: false,
+    resave: true,
+    saveUninitialized: true,
     cookie: {
       secure: false,
-      maxAge: 1000 * 60 * 30, // 30 minutos
+      httpOnly: true,
+      sameSite: "lax", 
+      maxAge: 1000 * 60 * 5,
     },
   }),
 );
@@ -40,16 +44,47 @@ app.use(
 // Verificar timeout de sesión
 app.use(verificarTimeout);
 
+// CSRF - generar token en sesión
+const crypto = require("crypto");
+app.use((req, res, next) => {
+  if (!req.session.csrfToken) {
+    req.session.csrfToken = crypto.randomBytes(32).toString("hex");
+  }
+  next();
+});
+
+// CSRF - verificar token en métodos mutantes (excepto rutas públicas)
+app.use((req, res, next) => {
+  const metodosMutantes = ["POST", "PUT", "DELETE", "PATCH"];
+  const rutasExcluidas = ["/api/auth/login", "/api/auth/registro", "/api/auth/csrf-token"];
+  if (metodosMutantes.includes(req.method) && !rutasExcluidas.includes(req.originalUrl)) {
+    const tokenHeader = req.headers["x-csrf-token"];
+    if (!tokenHeader || tokenHeader !== req.session.csrfToken) {
+      return res.status(403).json({ mensaje: "Token CSRF inválido" });
+    }
+  }
+  next();
+});
+
 // Conectar a la BD
 conectarDB();
 
 // Rutas públicas (no requieren sesión)
-app.use("/api/auth", require("./routes/autenticacion"));
+app.use("/api/auth", require("./routes/auth"));
 
+// Rutas protegidas (requieren sesión)
 // Rutas protegidas (requieren sesión)
 app.use("/api/vuelos", verificarSesion, require("./routes/vuelos"));
 app.use("/api/pasajeros", verificarSesion, require("./routes/pasajeros"));
-app.use("/api/reservas", verificarSesion, require("./routes/reservas"));
+app.use("/api/reservas", verificarSesion, require("./routes/reservas"));  
+app.use("/api/grupos", verificarSesion, require("./routes/grupos"));
+app.use("/api/dashboard", verificarSesion, require("./routes/dashboard"));
+app.use("/api/rutas", verificarSesion, require("./routes/rutasAereas"));
+app.use("/api/aviones", verificarSesion, require("./routes/aviones"));
+app.use("/api/asientos", verificarSesion, require("./routes/asientos"));
+app.use("/api/tripulacion", verificarSesion, require("./routes/tripulacion"));
+app.use("/api/pagos", verificarSesion, require("./routes/pagos")); 
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

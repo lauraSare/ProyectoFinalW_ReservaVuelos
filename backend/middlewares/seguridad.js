@@ -1,5 +1,3 @@
-const helmet = require("helmet");
-
 // Prevenir acceso a directorios
 const noAccesoDirectorios = (req, res, next) => {
   const rutasProhibidas = ["/backend", "/models", "/controllers", "/config"];
@@ -9,15 +7,15 @@ const noAccesoDirectorios = (req, res, next) => {
   next();
 };
 
-// Verificar timeout de sesión (30 minutos)
+// Verificar timeout de sesión (10 minutos)
 const verificarTimeout = (req, res, next) => {
   if (req.session.usuario) {
     const ahora = Date.now();
     const ultimaActividad = req.session.ultimaActividad || ahora;
     const tiempoInactivo = ahora - ultimaActividad;
-    const treintaMinutos = 30 * 60 * 1000;
+    const diezMinutos = 10 * 60 * 1000;
 
-    if (tiempoInactivo > treintaMinutos) {
+    if (tiempoInactivo > diezMinutos) {
       req.session.destroy();
       return res
         .status(401)

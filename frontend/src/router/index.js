@@ -7,6 +7,7 @@ import Vuelos from '../views/Vuelos.vue'
 import Pasajeros from '../views/Pasajeros.vue'
 import Reservas from '../views/Reservas.vue'
 import NotFound from '../views/NotFound.vue'
+import Tripulacion from '../views/Tripulacion.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,6 +22,7 @@ const router = createRouter({
     { path: '/vuelos', component: Vuelos, meta: { requiresAuth: true } },
     { path: '/pasajeros', component: Pasajeros, meta: { requiresAuth: true } },
     { path: '/reservas', component: Reservas, meta: { requiresAuth: true } },
+    { path: '/tripulacion', component: Tripulacion, meta: { requiresAuth: true } },
 
     // Página 404
     { path: '/:pathMatch(.*)*', component: NotFound },
@@ -28,12 +30,14 @@ const router = createRouter({
 })
 
 // Proteger rutas que requieren autenticación
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const usuario = localStorage.getItem('usuario')
   if (to.meta.requiresAuth && !usuario) {
-    next('/login')
-  } else {
-    next()
+    return { path: '/login' }
+  }
+  // Si ya está autenticado y va a login o registro, redirigir al dashboard
+  if ((to.path === '/' || to.path === '/login' || to.path === '/registro') && usuario) {
+    return { path: '/dashboard' }
   }
 })
 

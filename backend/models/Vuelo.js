@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 
 const Vuelo = sequelize.define('Vuelo', {
-    id_vuelos: {
+    id_vuelo: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
