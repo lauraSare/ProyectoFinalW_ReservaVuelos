@@ -1,14 +1,9 @@
 {
-  "build": {
-    "type": "npm",
-    "goal": "install && npm run build",
-    "dir": "frontend"
-  },
   "webRoot": "frontend/dist",
   "redirections": [
     {
       "type": "rewrite",
-      "from": "^(?!/assets/).*",
+      "from": "^/(?!assets/).*",
       "to": "/index.html"
     }
   ]
