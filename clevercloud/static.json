@@ -3,7 +3,7 @@
   "redirections": [
     {
       "type": "rewrite",
-      "from": "^/(?!assets/).*",
+      "from": "^/.*$",
       "to": "/index.html"
     }
   ]
