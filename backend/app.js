@@ -13,7 +13,19 @@ const { verificarSesion } = require("./middlewares/auth");
 const app = express();
 
 // Middlewares de seguridad
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.google.com", "https://www.gstatic.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://cdn.datatables.net", "https://code.jquery.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://cdn.datatables.net", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "https://www.gstatic.com"],
+      frameSrc: ["'self'", "https://www.google.com"],
+      connectSrc: ["'self'", "https://app-ee670211-7bf1-4ba5-9265-707f8e6decac.cleverapps.io"],
+    }
+  }
+}))
 app.use(noAccesoDirectorios);
 app.use(
   cors({
