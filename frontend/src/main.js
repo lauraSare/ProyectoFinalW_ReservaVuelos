@@ -92,7 +92,11 @@ export const iniciarContador = () => {
     }, 1000)
 }
 
-// Reiniciar con actividad del usuario
+// Enviar usuario en header para autenticación cross-domain
+const usuario = localStorage.getItem('usuario')
+if (usuario) {
+    axios.defaults.headers.common['x-usuario'] = usuario
+}
 window.addEventListener('mousemove', reiniciarTemporizador)
 window.addEventListener('keydown', reiniciarTemporizador)
 window.addEventListener('click', reiniciarTemporizador)

@@ -195,6 +195,7 @@ const handleLogin = async () => {
         }, { withCredentials: true })
         const usuario = res.data.usuario
         localStorage.setItem('usuario', JSON.stringify(usuario))
+        axios.defaults.headers.common['x-usuario'] = JSON.stringify(usuario)
         
         const bienvenida = usuario.genero === 'femenino' 
             ? `¡Bienvenida, ${usuario.nombre}! ` 
