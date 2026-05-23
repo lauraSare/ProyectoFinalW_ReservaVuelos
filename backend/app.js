@@ -97,6 +97,18 @@ app.use("/api/tripulacion", verificarSesion, require("./routes/tripulacion"));
 app.use("/api/pagos", verificarSesion, require("./routes/pagos")); 
 
 
+const path = require('path')
+
+// Servir frontend en producción
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')))
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(__dirname, '../frontend/dist/index.html'))
+    }
+  })
+}
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
