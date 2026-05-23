@@ -13,7 +13,7 @@ router.post('/logout', logout);
 
 // Ruta para obtener token CSRF
 router.get('/csrf-token', (req, res) => {
-  res.json({ csrfToken: req.session.csrfToken });
+  res.json({ csrfToken: req.session.csrfToken, sessionId: req.sessionID });
 });
 
 module.exports = router;

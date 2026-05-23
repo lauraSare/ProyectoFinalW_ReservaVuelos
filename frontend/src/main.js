@@ -100,10 +100,14 @@ window.addEventListener('click', reiniciarTemporizador)
 // Obtener token CSRF del backend
 export const obtenerCsrfToken = async () => {
     try {
-        const res = await axios.get('https://app-ee670211-7bf1-4ba5-9265-707f8e6decac.cleverapps.io/api/auth/csrf-token', {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL || 'https://app-ee670211-7bf1-4ba5-9265-707f8e6decac.cleverapps.io'}/api/auth/csrf-token`, {
             withCredentials: true
         })
         axios.defaults.headers.common['x-csrf-token'] = res.data.csrfToken
+        if (res.data.sessionId) {
+            localStorage.setItem('sessionId', res.data.sessionId)
+            axios.defaults.headers.common['x-session-id'] = res.data.sessionId
+        }
     } catch (e) {
         console.error('Error obteniendo CSRF token', e)
     }

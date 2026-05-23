@@ -43,6 +43,15 @@ app.use(
   }),
 );
 
+// Permitir session ID via header para clientes cross-domain
+app.use((req, res, next) => {
+    const sessionIdHeader = req.headers['x-session-id']
+    if (sessionIdHeader && !req.cookies?.['connect.sid']) {
+        req.sessionID = sessionIdHeader
+    }
+    next()
+})
+
 // Verificar timeout de sesión
 app.use(verificarTimeout);
 
