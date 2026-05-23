@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://app-ee670211-7bf1-4ba5-9265-707f8e6decac.cleverapps.io/api',
+  |baseURL: (import.meta.env.VITE_API_URL || 'https://app-ee670211-7bf1-4ba5-9265-707f8e6decac.cleverapps.io') + '/api',
   withCredentials: true,
 })
 
